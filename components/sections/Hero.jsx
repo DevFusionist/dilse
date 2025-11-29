@@ -41,11 +41,11 @@ export default function Hero() {
         {/* Text Content */}
         <div className="md:w-1/2 text-center md:text-left mb-10 md:mb-0 z-10 relative">
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-            Exquisite Personalized Gifts India: <br />
-            <span className="text-brand-gold">Crafted Exclusively For Your Story.</span>
+            dilse <br />
+            <span className="text-brand-gold">Dil se bana, dil tak pahunchne wala gift.</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-xl mx-auto md:mx-0">
-            Elevate the ordinary. Transform a gift into an heirloom with exquisite engraving and premium finish.
+            Handcrafted with love, personalized gifts that reach straight to the heart. Every piece tells your story.
           </p>
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
             <Link

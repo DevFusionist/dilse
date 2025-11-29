@@ -1,0 +1,36 @@
+{
+  "name": "dilse - Dil se bana, dil tak pahunchne wala gift.",
+  "short_name": "dilse",
+  "description": "Dil se bana, dil tak pahunchne wala gift. Handcrafted personalized gifts that reach straight to the heart.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#c39c4e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Shop All",
+      "short_name": "Shop",
+      "description": "Browse all personalized gifts",
+      "url": "/#featured",
+      "icons": [{ "src": "/favicon/favicon.png", "sizes": "192x192" }]
+    }
+  ]
+}
+

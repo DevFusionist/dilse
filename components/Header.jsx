@@ -43,7 +43,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         {/* Logo/Brand Name */}
         <Link href="/" className="text-3xl font-serif font-bold text-brand-gold tracking-widest">
-          The Engrave Co.<span className="text-2xl ml-1">⚜️</span>
+          dilse<span className="text-2xl ml-1">⚜️</span>
         </Link>
 
         {/* Navigation (Hidden on small screens) */}

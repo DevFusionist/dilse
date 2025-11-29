@@ -8,9 +8,9 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Brand Info */}
           <div>
-            <h3 className="text-xl font-serif text-brand-gold mb-4">The Engrave Co.</h3>
+            <h3 className="text-xl font-serif text-brand-gold mb-4">dilse</h3>
             <p className="text-sm text-gray-400">
-              Handcrafted heirlooms. We elevate gifting into an art form with premium engraving and finishing.
+              Dil se bana, dil tak pahunchne wala gift.
             </p>
           </div>
 
@@ -46,17 +46,17 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-white mb-4">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="#" className="hover:text-brand-gold transition duration-200">
+                <Link href="/refund-policy" className="hover:text-brand-gold transition duration-200">
                   Refund Policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-brand-gold transition duration-200">
+                <Link href="/privacy-policy" className="hover:text-brand-gold transition duration-200">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-brand-gold transition duration-200">
+                <Link href="/terms-of-service" className="hover:text-brand-gold transition duration-200">
                   Terms of Service
                 </Link>
               </li>
@@ -81,7 +81,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-brand-gold/20 text-center text-sm text-gray-400">
-          &copy; {new Date().getFullYear()} The Engrave Co. All rights reserved.
+          &copy; {new Date().getFullYear()} dilse. All rights reserved.
         </div>
       </div>
     </footer>

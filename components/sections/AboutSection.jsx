@@ -7,7 +7,7 @@ export default function AboutSection() {
         </h2>
         <div className="prose prose-lg mx-auto text-center text-gray-700">
           <p className="text-lg mb-4">
-            At The Engrave Co., we believe that every gift should tell a story. Our master craftsmen combine
+            At dilse, we believe that every gift should tell a story. Dil se bana, dil tak pahunchne wala gift. Our master craftsmen combine
             traditional Indian artistry with modern precision engraving techniques to create heirlooms that last
             generations.
           </p>
