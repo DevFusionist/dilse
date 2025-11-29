@@ -40,10 +40,10 @@ export default function Header() {
 
   return (
     <header className="bg-brand-navy shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4 flex justify-between items-center">
         {/* Logo/Brand Name */}
-        <Link href="/" className="text-3xl font-serif font-bold text-brand-gold tracking-widest">
-          dilse<span className="text-2xl ml-1">⚜️</span>
+        <Link href="/" className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-brand-gold tracking-widest">
+          dilse<span className="text-lg sm:text-xl md:text-2xl ml-1">⚜️</span>
         </Link>
 
         {/* Navigation (Hidden on small screens) */}
@@ -66,35 +66,37 @@ export default function Header() {
         </nav>
 
         {/* Icons */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
           <button
             onClick={() => setSearchOpen(true)}
-            className="text-white hover:text-brand-gold transition duration-200"
+            className="text-white hover:text-brand-gold transition duration-200 p-1"
+            aria-label="Search"
           >
-            <FaSearch className="text-xl" />
+            <FaSearch className="text-lg sm:text-xl" />
           </button>
-          <button className="text-white hover:text-brand-gold transition duration-200">
-            <FaUser className="text-xl" />
+          <button className="text-white hover:text-brand-gold transition duration-200 p-1" aria-label="User account">
+            <FaUser className="text-lg sm:text-xl" />
           </button>
           <button
             onClick={() => setIsCartOpen(true)}
-            className="text-white hover:text-brand-gold transition duration-200 relative"
+            className="text-white hover:text-brand-gold transition duration-200 relative p-1"
             aria-label="Open shopping cart"
           >
-            <FaShoppingBag ref={cartIconRef} className="text-xl" />
+            <FaShoppingBag ref={cartIconRef} className="text-lg sm:text-xl" />
             <span 
               ref={cartBadgeRef}
-              className="absolute top-[-8px] right-[-8px] text-xs bg-brand-gold text-brand-navy rounded-full h-5 w-5 flex items-center justify-center font-bold"
+              className="absolute top-[-6px] right-[-6px] sm:top-[-8px] sm:right-[-8px] text-[10px] sm:text-xs bg-brand-gold text-brand-navy rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center font-bold"
             >
               {getCartItemCount()}
             </span>
           </button>
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden text-white hover:text-brand-gold transition duration-200"
+            className="md:hidden text-white hover:text-brand-gold transition duration-200 p-1"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}
+            {mobileMenuOpen ? <FaTimes className="text-lg sm:text-xl" /> : <FaBars className="text-lg sm:text-xl" />}
           </button>
         </div>
       </div>

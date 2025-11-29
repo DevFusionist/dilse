@@ -77,14 +77,14 @@ export default function ProductGrid({ products = [], id, title, bgColor }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 
           ref={titleRef}
-          className="text-4xl md:text-5xl font-serif text-[#5C4033] text-center mb-12 font-bold"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-[#5C4033] text-center mb-8 md:mb-12 font-bold px-2"
         >
-          <span className="border-b-4 border-[#B8860B] pb-2">{title || 'Our Collection'}</span>
+          <span className="inline-block border-b-4 border-[#B8860B] pb-2">{title || 'Our Collection'}</span>
         </h2>
         
         <div
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
         >
           {products.map((product) => (
             <div
