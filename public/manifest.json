@@ -3,11 +3,44 @@
   "short_name": "dilse",
   "description": "Dil se bana, dil tak pahunchne wala gift. Handcrafted personalized gifts that reach straight to the heart.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
+  "background_color": "#1e3a5f",
   "theme_color": "#c39c4e",
   "orientation": "portrait-primary",
+  "dir": "ltr",
+  "lang": "en",
   "icons": [
+    {
+      "src": "/favicon/favicon.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon/favicon.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon/favicon.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon/favicon.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon/favicon.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/favicon/favicon.png",
       "sizes": "192x192",
@@ -16,12 +49,18 @@
     },
     {
       "src": "/favicon/favicon.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon/favicon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["shopping", "lifestyle"],
+  "categories": ["shopping", "lifestyle", "ecommerce"],
   "screenshots": [],
   "shortcuts": [
     {
@@ -30,7 +69,22 @@
       "description": "Browse all personalized gifts",
       "url": "/#featured",
       "icons": [{ "src": "/favicon/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Gifts for Men",
+      "short_name": "Men",
+      "description": "Browse gifts for men",
+      "url": "/#category-men",
+      "icons": [{ "src": "/favicon/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Gifts for Her",
+      "short_name": "Women",
+      "description": "Browse gifts for women",
+      "url": "/#category-women",
+      "icons": [{ "src": "/favicon/favicon.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
 

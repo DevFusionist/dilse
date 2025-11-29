@@ -1,11 +1,15 @@
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 import { gsap } from 'gsap';
 import { FaTimes } from 'react-icons/fa';
 import CartItem from './CartItem';
+import AuthModal from './AuthModal';
 
 export default function Cart() {
+  const router = useRouter();
   const {
     cart,
     removeFromCart,
@@ -15,6 +19,8 @@ export default function Cart() {
     setIsCartOpen,
     clearCart,
   } = useCart();
+  const { isAuthenticated, user } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
@@ -26,6 +32,18 @@ export default function Cart() {
     city: '',
     pincode: '',
   });
+
+  // Pre-fill customer info when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setCustomerInfo(prev => ({
+        ...prev,
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+      }));
+    }
+  }, [isAuthenticated, user]);
 
   const cartRef = useRef(null);
   const overlayRef = useRef(null);
@@ -96,6 +114,13 @@ export default function Cart() {
   };
 
   const initiateRazorpayPayment = async () => {
+    // Check if user is authenticated - double check
+    if (!isAuthenticated || !user) {
+      alert('Please login to proceed with payment');
+      setAuthModalOpen(true);
+      return;
+    }
+
     if (!validateForm()) return;
 
     setIsProcessing(true);
@@ -118,20 +143,35 @@ export default function Cart() {
             shippingAddress: `${customerInfo.address}, ${customerInfo.city} - ${customerInfo.pincode}`,
             items: cart.map((item) => `${item.name} x${item.quantity}`).join(', '),
           },
+          items: cart.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image,
+            description: item.description,
+          })),
         }),
       });
 
       const orderData = await orderResponse.json();
 
       if (!orderData.success) {
+        // If authentication error, show login modal
+        if (orderResponse.status === 401) {
+          alert('Please login to proceed with payment');
+          setAuthModalOpen(true);
+          setIsProcessing(false);
+          return;
+        }
         throw new Error(orderData.error || 'Failed to create order');
       }
 
-      // Initialize Razorpay checkout
+      // Initialize Razorpay checkout - INR only (India only)
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.order.amount,
-        currency: orderData.order.currency,
+        currency: 'INR', // Force INR currency
         name: 'DilSe',
         description: 'Purchase from DilSe',
         order_id: orderData.order.id,
@@ -145,6 +185,9 @@ export default function Cart() {
         },
         theme: {
           color: '#1e3a5f',
+        },
+        readonly: {
+          currency: true, // Lock currency to INR, disable currency conversion
         },
         handler: async function (response) {
           // Verify payment on server
@@ -165,9 +208,6 @@ export default function Cart() {
 
             if (verifyData.success) {
               // Payment successful
-              alert(
-                `🎉 Payment Successful!\n\nOrder ID: ${response.razorpay_order_id}\nPayment ID: ${response.razorpay_payment_id}\n\nThank you for shopping with DilSe!\nYou will receive a confirmation email shortly.`
-              );
               clearCart();
               setIsCartOpen(false);
               setShowCheckoutForm(false);
@@ -179,12 +219,30 @@ export default function Cart() {
                 city: '',
                 pincode: '',
               });
+              
+              // Show success message and redirect to home
+              alert(
+                `🎉 Payment Successful!\n\nOrder ID: ${response.razorpay_order_id}\nPayment ID: ${response.razorpay_payment_id}\n\nThank you for shopping with DilSe!\nYou will receive a confirmation email shortly.`
+              );
+              
+              // Redirect to home page after a short delay
+              setTimeout(() => {
+                router.push('/');
+              }, 500);
             } else {
               alert('Payment verification failed. Please contact support.');
+              // Redirect to home page on verification failure
+              setTimeout(() => {
+                router.push('/');
+              }, 1000);
             }
           } catch (error) {
             console.error('Verification error:', error);
             alert('Payment verification error. Please contact support.');
+            // Redirect to home page on error
+            setTimeout(() => {
+              router.push('/');
+            }, 1000);
           }
         },
         modal: {
@@ -198,11 +256,19 @@ export default function Cart() {
       razorpay.on('payment.failed', function (response) {
         alert(`Payment Failed!\n\nReason: ${response.error.description}\n\nPlease try again.`);
         setIsProcessing(false);
+        // Redirect to home page after payment failure
+        setTimeout(() => {
+          router.push('/');
+        }, 1500);
       });
       razorpay.open();
     } catch (error) {
       console.error('Payment initiation error:', error);
       alert('Failed to initiate payment. Please try again.');
+      // Redirect to home page on payment initiation error
+      setTimeout(() => {
+        router.push('/');
+      }, 1500);
     } finally {
       setIsProcessing(false);
     }
@@ -210,6 +276,14 @@ export default function Cart() {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
+    
+    // Check if user is authenticated before showing checkout form
+    if (!isAuthenticated || !user) {
+      alert('Please login to proceed with checkout');
+      setAuthModalOpen(true);
+      return;
+    }
+    
     setShowCheckoutForm(true);
   };
 
@@ -236,7 +310,12 @@ export default function Cart() {
   }, [cart, getCartTotal]);
 
   if (!isCartOpen) {
-    return null;
+    // Still render AuthModal even when cart is closed
+    return (
+      <>
+        <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+      </>
+    );
   }
 
   return (
@@ -433,9 +512,13 @@ export default function Cart() {
                   </div>
                   <button
                     onClick={handleCheckout}
-                    className="w-full py-3 px-6 bg-brand-gold text-brand-navy font-semibold rounded-lg hover:bg-[#b58e46] transition duration-300 shadow-md hover:shadow-lg"
+                    disabled={!isAuthenticated || !user}
+                    className={`w-full py-3 px-6 bg-brand-gold text-brand-navy font-semibold rounded-lg transition duration-300 shadow-md hover:shadow-lg ${
+                      !isAuthenticated || !user ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#b58e46]'
+                    }`}
+                    title={!isAuthenticated || !user ? 'Please login to proceed with checkout' : ''}
                   >
-                    Proceed to Checkout
+                    {!isAuthenticated || !user ? 'Login to Checkout' : 'Proceed to Checkout'}
                   </button>
                   <button
                     onClick={() => setIsCartOpen(false)}
@@ -448,10 +531,11 @@ export default function Cart() {
                 <>
                   <button
                     onClick={initiateRazorpayPayment}
-                    disabled={isProcessing}
+                    disabled={isProcessing || !isAuthenticated || !user}
                     className={`w-full py-3 px-6 bg-brand-gold text-brand-navy font-semibold rounded-lg transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center ${
-                      isProcessing ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#b58e46]'
+                      isProcessing || !isAuthenticated || !user ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#b58e46]'
                     }`}
+                    title={!isAuthenticated || !user ? 'Please login to proceed with payment' : ''}
                   >
                     {isProcessing ? (
                       <>
@@ -482,6 +566,7 @@ export default function Cart() {
           )}
         </div>
       </div>
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </>
   );
 }

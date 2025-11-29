@@ -1,4 +1,7 @@
 import crypto from 'crypto';
+import clientPromise from '../../../lib/mongodb';
+import { ObjectId } from 'mongodb';
+import { sendOrderConfirmationEmail, sendPaymentFailedEmail } from '../../../lib/email';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -31,12 +34,57 @@ export default async function handler(req, res) {
     const isAuthentic = expectedSignature === razorpay_signature;
 
     if (isAuthentic) {
-      // Payment is verified
-      // Here you can:
-      // 1. Update your database with order status
-      // 2. Send confirmation email
-      // 3. Generate invoice
-      // 4. Update inventory
+      const client = await clientPromise;
+      const db = client.db('dilse');
+      const ordersCollection = db.collection('orders');
+      const paymentsCollection = db.collection('payments');
+
+      // Find the order by razorpay order ID
+      const order = await ordersCollection.findOne({
+        razorpayOrderId: razorpay_order_id,
+      });
+
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          error: 'Order not found',
+        });
+      }
+
+      // Save payment record
+      const paymentData = {
+        orderId: order._id,
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature,
+        amount: order.amount,
+        currency: order.currency,
+        status: 'success',
+        verified: true,
+        createdAt: new Date(),
+      };
+
+      const paymentResult = await paymentsCollection.insertOne(paymentData);
+
+      // Update order status to paid
+      await ordersCollection.updateOne(
+        { _id: order._id },
+        {
+          $set: {
+            status: 'paid',
+            paymentId: paymentResult.insertedId,
+            updatedAt: new Date(),
+          },
+        }
+      );
+
+      // Send order confirmation email
+      try {
+        await sendOrderConfirmationEmail(order, paymentData);
+      } catch (emailError) {
+        console.error('Error sending order confirmation email:', emailError);
+        // Don't fail the request if email fails
+      }
 
       res.status(200).json({
         success: true,
@@ -45,6 +93,51 @@ export default async function handler(req, res) {
         paymentId: razorpay_payment_id,
       });
     } else {
+      // Save failed payment attempt
+      const client = await clientPromise;
+      const db = client.db('dilse');
+      const ordersCollection = db.collection('orders');
+      const paymentsCollection = db.collection('payments');
+
+      const order = await ordersCollection.findOne({
+        razorpayOrderId: razorpay_order_id,
+      });
+
+      if (order) {
+        const paymentData = {
+          orderId: order._id,
+          razorpayOrderId: razorpay_order_id,
+          razorpayPaymentId: razorpay_payment_id,
+          razorpaySignature: razorpay_signature,
+          amount: order.amount,
+          currency: order.currency,
+          status: 'failed',
+          verified: false,
+          failureReason: 'Signature verification failed',
+          createdAt: new Date(),
+        };
+
+        await paymentsCollection.insertOne(paymentData);
+
+        await ordersCollection.updateOne(
+          { _id: order._id },
+          {
+            $set: {
+              status: 'failed',
+              updatedAt: new Date(),
+            },
+          }
+        );
+
+        // Send payment failed email
+        try {
+          await sendPaymentFailedEmail(order, 'Signature verification failed');
+        } catch (emailError) {
+          console.error('Error sending payment failed email:', emailError);
+          // Don't fail the request if email fails
+        }
+      }
+
       res.status(400).json({
         success: false,
         error: 'Payment verification failed',

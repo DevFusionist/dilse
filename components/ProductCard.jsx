@@ -60,7 +60,7 @@ export default function ProductCard({ product }) {
   }, []);
   // ---------------------------------
 
-  const animateToCart = () => {
+  const animateToCart = (onComplete) => {
     if (!imageRef.current) return;
 
     // Get product image position (Start)
@@ -75,6 +75,23 @@ export default function ProductCard({ product }) {
     const endX = cartRect.left + cartRect.width / 2;
     const endY = cartRect.top + cartRect.height / 10;
 
+    // Get navbar height to ensure animation stays above it
+    const header = document.querySelector('header');
+    const headerHeight = header ? header.getBoundingClientRect().height : 80;
+    
+    // Calculate distance between start and end points
+    const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+    
+    // Dynamic height calculation: ensure animation goes high enough, especially when close to navbar
+    // Minimum height of 250px above the navbar, or 30% of the distance, whichever is larger
+    const minHeightAboveNavbar = 250;
+    const dynamicHeight = Math.max(minHeightAboveNavbar, distance * 0.3);
+    const topOfNavbar = headerHeight;
+    const midY = Math.min(startY, endY) - dynamicHeight;
+    
+    // Ensure the animation path never goes below the navbar
+    const safeMidY = Math.max(midY, topOfNavbar + 50);
+
     // Create Flying Product Element 
     const flyingProduct = document.createElement('div');
     const size = Math.min(productImageRect.width * 0.9, 100);
@@ -83,7 +100,7 @@ export default function ProductCard({ product }) {
     flyingProduct.style.top = `${startY}px`;
     flyingProduct.style.width = `${size}px`;
     flyingProduct.style.height = `${size}px`;
-    flyingProduct.style.zIndex = '100000'; 
+    flyingProduct.style.zIndex = '99999'; // Higher than navbar's z-50
     flyingProduct.style.pointerEvents = 'none';
     flyingProduct.style.borderRadius = '12px';
     flyingProduct.style.overflow = 'hidden';
@@ -105,7 +122,6 @@ export default function ProductCard({ product }) {
 
     // Calculate control point for curved path 
     const midX = (startX + endX) / 2;
-    const midY = Math.min(startY, endY) - 180;
     const duration = 0.9;
     
     // Create timeline
@@ -113,6 +129,10 @@ export default function ProductCard({ product }) {
         onComplete: () => {
             if (flyingProduct.parentNode) {
                 document.body.removeChild(flyingProduct);
+            }
+            // Call the completion callback after animation finishes
+            if (onComplete && typeof onComplete === 'function') {
+                onComplete();
             }
         }
     });
@@ -128,7 +148,7 @@ export default function ProductCard({ product }) {
         // Quadratic bezier curve calculation
         const t = progress;
         const curveX = (1 - t) * (1 - t) * startX + 2 * (1 - t) * t * midX + t * t * endX;
-        const curveY = (1 - t) * (1 - t) * startY + 2 * (1 - t) * t * midY + t * t * endY;
+        const curveY = (1 - t) * (1 - t) * startY + 2 * (1 - t) * t * safeMidY + t * t * endY;
         
         // Squash and Stretch
         const stretchAmount = Math.sin(progress * Math.PI) * 0.2; 
@@ -192,12 +212,6 @@ export default function ProductCard({ product }) {
           <button 
             ref={buttonRef}
             onClick={() => {
-              // Animate product flying to cart
-              animateToCart();
-              
-              // Add to cart
-              addToCart(product);
-              
               // Button animation
               if (buttonRef.current) {
                 gsap.to(buttonRef.current, {
@@ -208,6 +222,13 @@ export default function ProductCard({ product }) {
                   ease: 'power2.inOut',
                 });
               }
+              
+              // Animate product flying to cart first, then add to cart when animation completes
+              animateToCart(() => {
+                // Add to cart only after flying animation completes
+                // This ensures the cart count updates after the animation
+                addToCart(product);
+              });
             }}
             className="inline-block py-2 px-6 text-sm font-semibold bg-[#B8860B] text-white rounded-full hover:bg-[#a3780a] transition duration-300 shadow-md"
           >
