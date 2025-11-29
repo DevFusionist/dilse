@@ -2,6 +2,7 @@ import { useCart } from '../context/CartContext';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { FaTimes } from 'react-icons/fa';
 import CartItem from './CartItem';
 
 export default function Cart() {
@@ -260,11 +261,19 @@ export default function Cart() {
             <h2 className="text-2xl font-serif font-bold">
               {showCheckoutForm ? 'Checkout' : 'Shopping Cart'}
             </h2>
-            {/* Animated Hamburger Menu Button */}
+            {/* Close Button - Direct X for mobile/PWA, Animated hamburger for desktop */}
+            <button
+              onClick={() => setIsCartOpen(false)}
+              className="text-white hover:text-brand-gold p-1 md:hidden"
+              aria-label="Close cart"
+            >
+              <FaTimes className="text-xl" />
+            </button>
+            {/* Animated Hamburger Menu Button - Desktop only */}
             <button
               ref={hamburgerRef}
               onClick={() => setIsCartOpen(false)}
-              className="relative w-8 h-8 flex items-center justify-center group cursor-pointer z-10"
+              className="hidden md:flex relative w-8 h-8 items-center justify-center group cursor-pointer z-10"
               aria-label="Close cart"
             >
               <div className="relative w-6 h-5 flex flex-col justify-between">

@@ -92,7 +92,7 @@ export default function Header() {
           </button>
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden text-white hover:text-brand-gold transition duration-200 p-1"
+            className="md:hidden text-white hover:text-brand-gold p-1"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
